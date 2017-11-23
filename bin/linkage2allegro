@@ -15,7 +15,7 @@ __version__ = "2017.1"
 
 if __name__ == "__main__":
 
-    def help():
+    def help(code):
         print('''%s
 
 %s <pedin> <mapin> <PROGRAM> [OPTIONS]
@@ -26,12 +26,15 @@ OPTIONS:
     -h haplofile
     -d descentfile
         ''' % (__version__, argv[0]), file=stderr)
-        exit(-1)
+        exit(code)
+
+    if len(argv) == 1:
+        help(0)
+
+    elif len(argv) < 3:
+        help(-1)
 
     opts, rem = getopt(argv[4:], "-l:-h:-d:")
-
-    if len(argv) < 3:
-        help()
 
     pedin, mapin, program = argv[1:4]
     opts = dict(opts)
@@ -49,7 +52,7 @@ OPTIONS:
         obj = Swiftlink(pedin, mapin)
     else:
         print("Nuts! No such prog:", program, file=stderr)
-        help()
+        help(-1)
 
     if '-l' in opts:
         obj.extractLOD(opts['-l'])
