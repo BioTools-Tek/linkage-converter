@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 from getopt import getopt
 from sys import argv, stderr
 
 from linkage2allegro.genehunter import Genehunter
 from linkage2allegro.swiftlink import Swiftlink
+from linkage2allegro.converter import Converter
 from linkage2allegro.simwalk import Simwalk
 from linkage2allegro.merlin import Merlin
 
@@ -13,7 +16,7 @@ __version__ = "2017.1"
 if __name__ == "__main__":
 
     def help():
-        print >> stderr, '''%s
+        print('''%s
 
 %s <pedin> <mapin> <PROGRAM> [OPTIONS]
 
@@ -22,7 +25,7 @@ OPTIONS:
     -l lodfile
     -h haplofile
     -d descentfile
-''' % (__version__, argv[0])
+        ''' % (__version__, argv[0]), file=stderr)
         exit(-1)
 
     opts, rem = getopt(argv[4:], "-l:-h:-d:")
@@ -45,9 +48,8 @@ OPTIONS:
     elif program == "swiftlink":
         obj = Swiftlink(pedin, mapin)
     else:
-        print >> stderr, "Nuts! No such prog:", program
+        print("Nuts! No such prog:", program, file=stderr)
         help()
-        exit(-1)
 
     if '-l' in opts:
         obj.extractLOD(opts['-l'])

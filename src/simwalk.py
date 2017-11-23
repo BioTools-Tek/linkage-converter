@@ -1,5 +1,5 @@
 from __future__ import print_function
-from converter import Converter
+from linkage2allegro.converter import Converter
 
 class Simwalk(Converter):
 
