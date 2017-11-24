@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name = 'Linkage2Allegro',
-      version = '2017.1',
+      version = '2017.2',
       description = 'Converts between linkage output formats {Genehunter, Merlin, Simwalk, Swiftlink} --> Allegro ',
       url = 'https://github.com/BioTools-Tek/linkage-converter',
       author = 'Mehmet Tekman',

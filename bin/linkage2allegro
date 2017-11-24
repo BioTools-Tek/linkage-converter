@@ -11,7 +11,7 @@ from linkage2allegro.converter import Converter
 from linkage2allegro.simwalk import Simwalk
 from linkage2allegro.merlin import Merlin
 
-__version__ = "2017.1"
+__version__ = "2017.2"
 
 if __name__ == "__main__":
 
