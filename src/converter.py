@@ -1,4 +1,5 @@
 from bisect import bisect_left
+from sys import stderr
 
 class Converter:
     """
