@@ -1,4 +1,3 @@
-from __future__ import print_function
 from linkage2allegro.converter import Converter
 
 class Genehunter(Converter):
@@ -17,12 +16,16 @@ class Genehunter(Converter):
                         self.haplo_map[fam_id] = {}
 
                     line = ""
-
+                    max_line = 100000
                     while not line.startswith("*****"):
+                        max_line -= 1
+                        if max_line < 0:
+                            return False
+
                         line = hio.readline()
-                        indiv_all1 = map(int, line.split())
+                        indiv_all1 = [int(x) for x in line.split()]
                         line = hio.readline()
-                        indiv_all2 = map(int, line.split())
+                        indiv_all2 = [int(x) for x in line.split()]
 
                         if indiv_all1 == [] and indiv_all2 == []:
                             return True
@@ -30,70 +33,74 @@ class Genehunter(Converter):
                         indiv_id = int(indiv_all1[0])
 
                         if len(indiv_all1) != len(indiv_all2) + 4:
-                            print >> stderr, (
-                                "Allele mismatch for indiv",
-                                fam_id, indiv_id)
+                            print("Allele mismatch for indiv", fam_id, indiv_id, file=stderr)
                             exit(-1)
 
                         self.haplo_map[fam_id][indiv_id] = (
                             indiv_all1[4:],
                             indiv_all2
                         )
+
             except IOError:
                 hio.close()
                 return True
 
     def extractLOD(self, file):
-
         pos_lod = {}  # pos -> lod
 
         with open(file, 'r') as fio:
-            # Jump to marker positions
-            line = ""
-            while not line.startswith("Current map ("):
-                line = fio.readline()
-                # iterate
 
-            # # Extract gts
-            # while not line.startswith("npl"):
-            #     line = fio.readline()
-            #     gt_line += line.splitlines()[0] + " "
+            line_found = {
+                ("position", "NPL_score", "p-value", "information") : False,                                  # NPL
+                ("position", "LOD_score", "(alpha,", "HLOD)", "information") : False,                         # LOD
+                ("position", "LOD_score", "(alpha,", "HLOD)", "NPL_score", "p-value", "information") : False  # both
+            }
+            posline_found = False
 
-            # Get num pedigrees
-            while not line.startswith("Totalling pedigrees"):
-                line = fio.readline()
-                # iterate
+            for line in fio:
+                tokens = tuple(Converter.tokenizer(line))
+                
+                # Jump to LOD or NPL scoring
+                if tokens in line_found:
+                    line_found[tokens] = True
+                    posline_found = True
+                    continue
 
-            # Jump to LOD scoring
-            while not line.startswith("position LOD_score  (alpha, HLOD)"):
-                line = fio.readline()
+                # Reached pos line
+                if posline_found:
 
-            # Extract lod
-            line = fio.readline()
+                    lod, alpha, hlod = "-INFINITY", "(0,", "0)"
+                    parsed = False
 
-            while len(line) != 1:
-                # print len(line), line
-                (gpos, lod, alpha, hlod,
-                 npl, pval, info) = Converter.tokenizer(line)
-                gpos = float(gpos)
+                    if len(tokens) == 4:
+                        gpos, lod, pval, info = tokens
+                    elif len(tokens) == 5:
+                        gpos, lod, alpha, hlod, info = tokens
+                    elif len(tokens) == 7:
+                        gpos, lod, alpha, hlod, npl, pval, info = tokens
+                    else:
+                        continue
+                        
+                    if lod == "-INFINITY":
+                        lod = -10000
+                        
+                    gpos = float(gpos)
+                    lod = float(lod)
+                    alpha = float(alpha.split("(")[-1].split(",")[0])
+                    hlod = float(hlod.split(")")[0])
 
-                if lod == "-INFINITY":
-                    lod = -10000
-                lod = float(lod)
+                    # insert
+                    if gpos not in pos_lod:
+                        pos_lod[gpos] = [lod, alpha, hlod]
+                    else:
+                        # update if new lod is larger
+                        old_lod = pos_lod[gpos][0]
+                        if lod > old_lod:
+                            pos_lod[gpos][0] = lod
 
-                alpha = float(alpha.split("(")[-1].split(",")[0])
-                hlod = float(hlod.split(")")[0])
+                #else:if not all_found:
+                #    raise Exception("Could not find any linkage data")
 
-                # insert
-                if gpos not in pos_lod:
-                    pos_lod[gpos] = [lod, alpha, hlod]
-                else:
-                    # update if new lod is larger
-                    old_lod = pos_lod[gpos][0]
-                    if lod > old_lod:
-                        pos_lod[gpos][0] = lod
-
-                line = fio.readline()
             fio.close()
 
         self.makeLODArray(pos_lod)
