@@ -1,3 +1,5 @@
+from __future__ import print_function
+from sys import stderr
 from bisect import bisect_left
 
 class Converter:
@@ -25,7 +27,7 @@ class Converter:
     def __populatePedigree(self, input_ped):
         with open(input_ped, "r") as pio:
             for line in pio:
-                tokens = map(int, line.split())
+                tokens = [int(x) for x in line.split()]
                 f_id, p_id, father, mother, gender, affect = tokens[:6]
 
                 if f_id not in self.pedigree:
@@ -35,7 +37,7 @@ class Converter:
                         father, mother, gender, affect
                     )
                 else:
-                    print >> stderr, "Duplicate individual:", f_id, p_id
+                    print("Duplicate individual:", f_id, p_id, file=stderr)
                     exit(-1)
 
     def __populateMarkerMap(self, mapin):
@@ -139,7 +141,7 @@ class Converter:
         header = Converter.lod_line_buffer % (
             "location", "LOD", "alpha", "HLOD", "marker"
         )
-        print >> out_lod, header
+        print(header, file=out_lod)
 
         for pos, lod, alpha, hlod, marker in self.lod_array:
             out_line = Converter.lod_line_buffer % (
@@ -149,9 +151,9 @@ class Converter:
                 "%.4f" % hlod,
                 marker
             )
-            print >> out_lod, out_line
+            print(out_line, file=out_lod)
         out_lod.close()
-        print >> stderr, "Wrote: ", out_lod.name
+        print("Wrote: ", out_lod.name, file=stderr)
 
     def writeDescent(self):
         self.writeHaplo(True)
@@ -167,7 +169,7 @@ class Converter:
             1, 1, 1, 1, 1, 1
         )  # *range(6) (unpack in py3 only...)
         headers = self.__generateHeaders(len(dummy_l)) + '\n'
-        print >> out_file, headers
+        print(headers, file=out_file)
 
         for fam_id in map_map:
             for indiv_id in map_map[fam_id]:
@@ -179,13 +181,13 @@ class Converter:
                     fam_id, indiv_id, father, mother, gender, affect
                 )
 
-                print >> out_file, indiv_data + " ".join(map(
+                print(indiv_data + " ".join(map(
                     lambda x: "%-2d" % x, alleles[0]
-                ))
-                print >> out_file, indiv_data + " ".join(map(
+                )), file=out_file)
+
+                print(indiv_data + " ".join(map(
                     lambda x: "%-2d" % x, alleles[1]
-                ))
+                )), file=out_file)
         out_file.close()
-        print >> stderr, "Wrote: ", out_file.name
 
-
+        print("Wrote: ", out_file.name, file=stderr)
