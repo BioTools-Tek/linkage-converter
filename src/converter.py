@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 from __future__ import print_function
+
 from sys import stderr
 from bisect import bisect_left
 from sys import stderr
