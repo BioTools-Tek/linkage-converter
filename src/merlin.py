@@ -1,4 +1,3 @@
-from __future__ import print_function
 from linkage2allegro.converter import Converter
 
 class Merlin(Converter):    
@@ -18,7 +17,7 @@ class Merlin(Converter):
         def flushTmpData(tmp):
             # finish populating alleles
             if len(tmp[1]) != len(tmp[2]):
-                print >> stderr, "length mismatch"
+                print("length mismatch", file=stderr)
                 exit(-1)
 
             for tpa in range(len(tmp[1])):
@@ -79,7 +78,7 @@ class Merlin(Converter):
                 ]
 
                 if len(multiple_alleles) != len(tmp[1]):
-                    print >> stderr, "Num alleles and num percs mismatch"
+                    print("Num alleles and num percs mismatch", file=stderr)
                     exit(-1)
 
                 for a in range(len(multiple_alleles)):

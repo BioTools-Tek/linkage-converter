@@ -1,4 +1,3 @@
-from __future__ import print_function
 from linkage2allegro.converter import Converter
 
 class Simwalk(Converter):
@@ -136,7 +135,7 @@ class Simwalk(Converter):
                 if len(tokens) == 1 and not line.startswith(" "):
                     current_marker = tokens[0].splitlines()[0].strip()
                     if current_marker in pos_marker_lod:
-                        print >> stderr, "Duplicate", current_marker
+                        print("Duplicate", current_marker, file=stderr)
                         exit(-1)
 
                     pos_marker_lod[current_marker] = {}
@@ -175,7 +174,7 @@ class Simwalk(Converter):
                     for relative_gpos in offset_map:
                         abs_gpos = gpos + relative_gpos
                         if abs_gpos in pos_lod:
-                            print >> stderr, "Duplicate abs cM", abs_gpos
+                            print("Duplicate abs cM", abs_gpos, file=stderr)
                             exit(-1)
 
                         pos_lod[abs_gpos] = offset_map[relative_gpos]

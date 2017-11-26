@@ -1,4 +1,3 @@
-from __future__ import print_function
 from linkage2allegro.converter import Converter
 
 class Swiftlink(Converter):
