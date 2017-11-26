@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from __future__ import print_function
 
@@ -31,7 +31,7 @@ OPTIONS:
     if len(argv) == 1:
         help(0)
 
-    elif len(argv) < 3:
+    elif len(argv) < 4:
         help(-1)
 
     opts, rem = getopt(argv[4:], "-l:-h:-d:")
